@@ -7,278 +7,7 @@
     <title>Life OS</title>
 
     <link rel="stylesheet" href="style.css">
-    <script>
-        /* =================================
-   LIFE OS - JAVASCRIPT FOUNDATION
-================================= */
-
-// Application State
-const appState = {
-    tasks: [],
-    notes: [],
-    goals: [],
-    expenses: [],
-    events: [],
-    focusSessions: 0
-};
-
-
-// =================================
-// DOM ELEMENTS
-// =================================
-
-const navLinks = document.querySelectorAll(".nav-link");
-
-
-// =================================
-// NAVIGATION
-// =================================
-
-navLinks.forEach(link => {
-
-    link.addEventListener("click", (event) => {
-
-        event.preventDefault();
-
-        navLinks.forEach(item => {
-            item.classList.remove("active");
-        });
-
-        link.classList.add("active");
-
-    });
-
-});
-
-
-// =================================
-// DATE & TIME
-// =================================
-
-function updateDateTime() {
-
-    const now = new Date();
-
-    const dayName = now.toLocaleDateString("en-US", {
-        weekday: "long"
-    });
-
-    const date = now.toLocaleDateString("en-US", {
-        day: "numeric",
-        month: "long",
-        year: "numeric"
-    });
-
-    const dateContainer = document.querySelector(".topbar-date");
-
-    if (dateContainer) {
-
-        dateContainer.innerHTML = `
-            <span>${dayName}</span>
-            <strong>${date}</strong>
-        `;
-
-    }
-}
-
-updateDateTime();
-
-
-// =================================
-// LOCAL STORAGE
-// =================================
-
-function saveData() {
-
-    localStorage.setItem(
-        "lifeOS",
-        JSON.stringify(appState)
-    );
-
-}
-
-
-function loadData() {
-
-    const savedData = localStorage.getItem("lifeOS");
-
-    if (!savedData) {
-        return;
-    }
-
-    const parsedData = JSON.parse(savedData);
-
-    Object.assign(appState, parsedData);
-
-}
-
-
-loadData();
-
-
-// =================================
-// INITIALIZE APP
-// =================================
-
-function initializeApp() {
-
-    console.log("Life OS initialized successfully 🚀");
-
-    console.log("Current state:", appState);
-
-}
-
-
-initializeApp();
-// =================================
-// TASK FORM
-// =================================
-
-const addTaskBtn = document.getElementById("addTaskBtn");
-const taskForm = document.getElementById("taskForm");
-
-addTaskBtn.addEventListener("click", () => {
-
-    taskForm.classList.toggle("show");
-
-});
-// =================================
-// TASK CREATION
-// =================================
-
-const taskInput = document.getElementById("taskInput");
-const taskPriority = document.getElementById("taskPriority");
-const saveTaskBtn = document.getElementById("saveTaskBtn");
-const taskList = document.querySelector(".task-list");
-
-saveTaskBtn.addEventListener("click", addTask);
-
-function addTask() {
-
-    const title = taskInput.value.trim();
-    const priority = taskPriority.value;
-
-    if (!title) {
-        taskInput.focus();
-        return;
-    }
-
-    const task = {
-        id: Date.now(),
-        title: title,
-        priority: priority,
-        completed: false,
-        createdAt: new Date().toISOString()
-    };
-
-    appState.tasks.push(task);
-
-    saveData();
-
-    renderTasks();
-
-    taskInput.value = "";
-    taskPriority.value = "low";
-
-    taskForm.classList.remove("show");
-}
-
-
-// =================================
-// RENDER TASKS
-// =================================
-
-function renderTasks() {
-
-    taskList.innerHTML = "";
-
-    appState.tasks.forEach(task => {
-
-        const taskItem = document.createElement("div");
-
-        taskItem.className =
-            `task-item ${task.completed ? "completed" : ""}`;
-
-        taskItem.innerHTML = `
-            <button class="task-check" data-id="${task.id}">
-                ${task.completed ? "✓" : ""}
-            </button>
-
-            <div class="task-content">
-                <strong>${task.title}</strong>
-                <span>
-                    ${task.completed ? "Completed" : "Added just now"}
-                </span>
-            </div>
-
-            <span class="task-priority ${task.priority}">
-                ${task.priority}
-            </span>
-
-            <button class="task-delete" data-id="${task.id}">
-                🗑️
-            </button>
-        `;
-
-        taskList.appendChild(taskItem);
-
-    });
-
-    setupTaskActions();
-}
-function setupTaskActions() {
-
-    const checkButtons =
-        document.querySelectorAll(".task-check");
-
-    const deleteButtons =
-        document.querySelectorAll(".task-delete");
-
-
-    checkButtons.forEach(button => {
-
-        button.addEventListener("click", () => {
-
-            const taskId = Number(button.dataset.id);
-
-            const task = appState.tasks.find(
-                task => task.id === taskId
-            );
-
-            if (!task) return;
-
-            task.completed = !task.completed;
-
-            saveData();
-
-            renderTasks();
-
-        });
-
-    });
-
-
-    deleteButtons.forEach(button => {
-
-        button.addEventListener("click", () => {
-
-            const taskId = Number(button.dataset.id);
-
-            appState.tasks =
-                appState.tasks.filter(
-                    task => task.id !== taskId
-                );
-
-            saveData();
-
-            renderTasks();
-
-        });
-
-    });
-
-}
-    </script>
+    
     <style>
         /* ================================
    LIFE OS - FOUNDATION
@@ -1381,6 +1110,7 @@ button {
     color: var(--danger);
 }
     </style>
+    <link rel="stylesheet" href="extra.css">
 </head>
 
 <body>
@@ -1397,42 +1127,42 @@ button {
 
             <nav class="sidebar-nav">
 
-                <a href="#" class="nav-link active">
+                <a href="#" class="nav-link active" data-target="sec-dashboard">
                     <span>🏠</span>
                     Dashboard
                 </a>
 
-                <a href="#" class="nav-link">
+                <a href="#" class="nav-link" data-target="sec-tasks">
                     <span>✅</span>
                     Tasks
                 </a>
 
-                <a href="#" class="nav-link">
+                <a href="#" class="nav-link" data-target="sec-calendar">
                     <span>📅</span>
                     Calendar
                 </a>
 
-                <a href="#" class="nav-link">
+                <a href="#" class="nav-link" data-target="sec-notes">
                     <span>📖</span>
                     Notes
                 </a>
 
-                <a href="#" class="nav-link">
+                <a href="#" class="nav-link" data-target="sec-goals">
                     <span>🎯</span>
                     Goals
                 </a>
 
-                <a href="#" class="nav-link">
+                <a href="#" class="nav-link" data-target="sec-focus">
                     <span>⏱️</span>
                     Focus
                 </a>
 
-                <a href="#" class="nav-link">
+                <a href="#" class="nav-link" data-target="sec-expenses">
                     <span>💰</span>
                     Expenses
                 </a>
 
-                <a href="#" class="nav-link">
+                <a href="#" class="nav-link" data-target="sec-weather">
                     <span>🌤️</span>
                     Weather
                 </a>
@@ -1441,7 +1171,7 @@ button {
 
             <div class="sidebar-bottom">
 
-                <a href="#" class="nav-link">
+                <a href="#" class="nav-link" data-action="settings">
                     <span>⚙️</span>
                     Settings
                 </a>
@@ -1471,418 +1201,196 @@ button {
 
             <section class="dashboard">
 
-                <div class="dashboard-title">
-                    <h2>Dashboard</h2>
-                    <p>Here's what's happening today.</p>
-                </div>
-
-                <div class="stats-grid">
-
-    <div class="stat-card">
-        <div class="stat-icon">✅</div>
-        <div class="stat-info">
-            <span>Tasks</span>
-            <strong>12</strong>
-            <small>4 completed today</small>
-        </div>
-    </div>
-
-    <div class="stat-card">
-        <div class="stat-icon">🎯</div>
-        <div class="stat-info">
-            <span>Goals</span>
-            <strong>5</strong>
-            <small>2 goals in progress</small>
-        </div>
-    </div>
-
-    <div class="stat-card">
-        <div class="stat-icon">💰</div>
-        <div class="stat-info">
-            <span>Expenses</span>
-            <strong>3,250 EGP</strong>
-            <small>This month</small>
-        </div>
-    </div>
-
-    <div class="stat-card">
-        <div class="stat-icon">⏱️</div>
-        <div class="stat-info">
-            <span>Focus Time</span>
-            <strong>2h 35m</strong>
-            <small>Today</small>
-        </div>
-    </div>
-
-    </div>
-    <div class="dashboard-grid">
-
-    <!-- Today's Tasks -->
-    <div class="dashboard-card tasks-card">
-
-        <div class="card-header">
-            <div>
-                <h3>Today's Tasks</h3>
-                <p>Keep your day organized.</p>
+            <div class="dashboard-title" id="sec-dashboard">
+                <h2>Dashboard</h2>
+                <p>Here's what's happening today.</p>
+                <p class="demo-note" id="demoNote" hidden>
+                    Showing sample data.
+                    <button type="button" class="link-btn" id="clearDemoBtn">Clear sample data</button>
+                </p>
             </div>
 
-            <button class="card-action" id="addTaskBtn">+ Add Task</button>
-        </div>
-
-        <div class="task-list">
-
-            <div class="task-item completed">
-                <div class="task-check">✓</div>
-
-                <div class="task-content">
-                    <strong>Finish HTML structure</strong>
-                    <span>Completed</span>
-                </div>
-
-                <span class="task-priority low">Low</span>
-            </div>
-
-
-            <div class="task-item">
-                <div class="task-check"></div>
-
-                <div class="task-content">
-                    <strong>Build dashboard UI</strong>
-                    <span>Today • 6:00 PM</span>
-                </div>
-
-                <span class="task-priority high">High</span>
-            </div>
-
-
-            <div class="task-item">
-                <div class="task-check"></div>
-
-                <div class="task-content">
-                    <strong>Review JavaScript</strong>
-                    <span>Today • 8:00 PM</span>
-                </div>
-
-                <span class="task-priority medium">Medium</span>
-            </div>
-
-
-            <div class="task-item">
-                <div class="task-check"></div>
-
-                <div class="task-content">
-                    <strong>Plan tomorrow</strong>
-                    <span>Today • 10:00 PM</span>
-                </div>
-
-                <span class="task-priority low">Low</span>
-            </div>
-
-        </div>
-        <div class="task-form" id="taskForm">
-
-    <input
-        type="text"
-        id="taskInput"
-        placeholder="What do you need to do?"
-    >
-
-    <select id="taskPriority">
-        <option value="low">Low</option>
-        <option value="medium">Medium</option>
-        <option value="high">High</option>
-    </select>
-
-    <button id="saveTaskBtn">Add Task</button>
-
-</div>
-
-    </div>
-
-
-    <!-- Productivity -->
-    <div class="dashboard-card productivity-card">
-
-        <div class="card-header">
-            <div>
-                <h3>Today's Productivity</h3>
-                <p>Your progress today.</p>
-            </div>
-        </div>
-
-        <div class="productivity-score">
-            <strong>78%</strong>
-            <span>Great work!</span>
-        </div>
-
-        <div class="progress-bar">
-            <div class="progress-fill"></div>
-        </div>
-
-        <div class="productivity-stats">
-            <div>
-                <strong>8</strong>
-                <span>Completed</span>
-            </div>
-
-            <div>
-                <strong>3</strong>
-                <span>Remaining</span>
-            </div>
-
-            <div>
-                <strong>2h 35m</strong>
-                <span>Focus Time</span>
-            </div>
-        </div>
-
-    </div>
-
-</div>
-<div class="dashboard-grid secondary-grid">
-
-    <!-- Goals Overview -->
-    <div class="dashboard-card">
-
-        <div class="card-header">
-            <div>
-                <h3>Goals Overview</h3>
-                <p>Track your progress.</p>
-            </div>
-
-            <button class="card-action">View All</button>
-        </div>
-
-        <div class="goals-list">
-
-            <div class="goal-item">
-
-                <div class="goal-top">
-                    <div class="goal-name">
-                        <span class="goal-icon">💻</span>
-                        <strong>Learn JavaScript</strong>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">✅</div>
+                    <div class="stat-info">
+                        <span>Tasks</span>
+                        <strong id="statTasks">0</strong>
+                        <small id="statTasksSub">0 completed today</small>
                     </div>
-
-                    <span>80%</span>
                 </div>
-
-                <div class="goal-progress">
-                    <div class="goal-progress-fill" style="width: 80%;"></div>
-                </div>
-
-                <small>Deadline: 30 August</small>
-
-            </div>
-
-
-            <div class="goal-item">
-
-                <div class="goal-top">
-                    <div class="goal-name">
-                        <span class="goal-icon">🏋️</span>
-                        <strong>Fitness Goal</strong>
+                <div class="stat-card">
+                    <div class="stat-icon">🎯</div>
+                    <div class="stat-info">
+                        <span>Goals</span>
+                        <strong id="statGoals">0</strong>
+                        <small id="statGoalsSub">0 in progress</small>
                     </div>
-
-                    <span>65%</span>
                 </div>
-
-                <div class="goal-progress">
-                    <div class="goal-progress-fill" style="width: 65%;"></div>
-                </div>
-
-                <small>Deadline: 15 September</small>
-
-            </div>
-
-
-            <div class="goal-item">
-
-                <div class="goal-top">
-                    <div class="goal-name">
-                        <span class="goal-icon">📚</span>
-                        <strong>Read 10 Books</strong>
+                <div class="stat-card">
+                    <div class="stat-icon">💰</div>
+                    <div class="stat-info">
+                        <span>Expenses</span>
+                        <strong id="statExpenses">0 EGP</strong>
+                        <small>This month</small>
                     </div>
-
-                    <span>40%</span>
                 </div>
-
-                <div class="goal-progress">
-                    <div class="goal-progress-fill" style="width: 40%;"></div>
-                </div>
-
-                <small>Deadline: 31 December</small>
-
-            </div>
-
-        </div>
-
-    </div>
-
-
-    <!-- Upcoming -->
-    <div class="dashboard-card">
-
-        <div class="card-header">
-            <div>
-                <h3>Upcoming</h3>
-                <p>What's coming next.</p>
-            </div>
-
-            <button class="card-action">Calendar</button>
-        </div>
-
-        <div class="upcoming-list">
-
-            <div class="upcoming-item">
-
-                <div class="upcoming-date">
-                    <strong>12</strong>
-                    <span>AUG</span>
-                </div>
-
-                <div class="upcoming-content">
-                    <strong>Front-End Project</strong>
-                    <span>10:00 AM • Project Deadline</span>
-                </div>
-
-            </div>
-
-
-            <div class="upcoming-item">
-
-                <div class="upcoming-date">
-                    <strong>14</strong>
-                    <span>AUG</span>
-                </div>
-
-                <div class="upcoming-content">
-                    <strong>Study Session</strong>
-                    <span>5:30 PM • JavaScript</span>
-                </div>
-
-            </div>
-
-
-            <div class="upcoming-item">
-
-                <div class="upcoming-date">
-                    <strong>18</strong>
-                    <span>AUG</span>
-                </div>
-
-                <div class="upcoming-content">
-                    <strong>Gym Training</strong>
-                    <span>7:00 PM • Training</span>
-                </div>
-
-            </div>
-
-        </div>
-
-    </div>
-
-</div>
-<div class="dashboard-grid final-grid">
-
-    <!-- Quick Notes -->
-    <div class="dashboard-card">
-
-        <div class="card-header">
-            <div>
-                <h3>Quick Notes</h3>
-                <p>Your latest thoughts.</p>
-            </div>
-
-            <button class="card-action">View All</button>
-        </div>
-
-        <div class="notes-preview">
-
-            <div class="note-item">
-                <div class="note-icon">📝</div>
-
-                <div class="note-content">
-                    <strong>Life OS Project</strong>
-                    <span>Finish the dashboard and start JavaScript...</span>
-                    <small>Today • 7:20 PM</small>
+                <div class="stat-card">
+                    <div class="stat-icon">⏱️</div>
+                    <div class="stat-info">
+                        <span>Focus Time</span>
+                        <strong id="statFocus">0m</strong>
+                        <small>Today</small>
+                    </div>
                 </div>
             </div>
 
-            <div class="note-item">
-                <div class="note-icon">💡</div>
+            <div class="dashboard-grid">
+                <div class="dashboard-card tasks-card" id="sec-tasks">
+                    <div class="card-header">
+                        <div>
+                            <h3>Tasks</h3>
+                            <p>Keep your day organized.</p>
+                        </div>
+                        <button class="card-action" id="addTaskBtn">+ Add Task</button>
+                    </div>
+                    <div class="task-list" id="taskList"></div>
+                    <div class="task-form" id="taskForm">
+                        <input type="text" id="taskInput" placeholder="What do you need to do?" maxlength="120" aria-label="Task title">
+                        <select id="taskPriority" aria-label="Priority">
+                            <option value="low">Low</option>
+                            <option value="medium">Medium</option>
+                            <option value="high">High</option>
+                        </select>
+                        <button id="saveTaskBtn">Add Task</button>
+                    </div>
+                </div>
 
-                <div class="note-content">
-                    <strong>Project Ideas</strong>
-                    <span>Think about new features for the portfolio.</span>
-                    <small>Yesterday</small>
+                <div class="dashboard-card productivity-card" id="sec-focus">
+                    <div class="card-header">
+                        <div>
+                            <h3>Productivity &amp; Focus</h3>
+                            <p>Your progress today.</p>
+                        </div>
+                    </div>
+                    <div class="productivity-score">
+                        <strong id="scoreValue">0%</strong>
+                        <span id="scoreText">Add a task to start</span>
+                    </div>
+                    <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width: 0%;"></div></div>
+                    <div class="productivity-stats">
+                        <div><strong id="prodCompleted">0</strong><span>Completed</span></div>
+                        <div><strong id="prodRemaining">0</strong><span>Remaining</span></div>
+                        <div><strong id="prodFocus">0m</strong><span>Focus Time</span></div>
+                    </div>
+                    <div class="focus-timer">
+                        <strong id="focusClock" aria-live="off">00:00</strong>
+                        <button type="button" class="card-action" id="focusToggle" aria-pressed="false">Start focus</button>
+                    </div>
                 </div>
             </div>
 
-            <div class="note-item">
-                <div class="note-icon">📚</div>
+            <div class="dashboard-grid secondary-grid">
+                <div class="dashboard-card" id="sec-goals">
+                    <div class="card-header">
+                        <div>
+                            <h3>Goals Overview</h3>
+                            <p>Track your progress.</p>
+                        </div>
+                        <span class="header-actions">
+                            <button class="card-action" id="viewAllGoals" hidden>View All</button>
+                            <button class="card-action" data-open-form="goal">+ Add Goal</button>
+                        </span>
+                    </div>
+                    <div class="goals-list" id="goalsList"></div>
+                </div>
 
-                <div class="note-content">
-                    <strong>Study Notes</strong>
-                    <span>Review JavaScript DOM and Local Storage.</span>
-                    <small>10 August</small>
+                <div class="dashboard-card" id="sec-calendar">
+                    <div class="card-header">
+                        <div>
+                            <h3>Upcoming</h3>
+                            <p>What's coming next.</p>
+                        </div>
+                        <button class="card-action" data-open-form="event">+ Add Event</button>
+                    </div>
+                    <div class="upcoming-list" id="upcomingList"></div>
                 </div>
             </div>
 
-        </div>
+            <div class="dashboard-grid final-grid">
+                <div class="dashboard-card" id="sec-notes">
+                    <div class="card-header">
+                        <div>
+                            <h3>Quick Notes</h3>
+                            <p>Your latest thoughts.</p>
+                        </div>
+                        <span class="header-actions">
+                            <button class="card-action" id="viewAllNotes" hidden>View All</button>
+                            <button class="card-action" data-open-form="note">+ Add Note</button>
+                        </span>
+                    </div>
+                    <div class="notes-preview" id="notesList"></div>
+                </div>
 
-    </div>
-
-
-    <!-- Weather -->
-    <div class="dashboard-card weather-card">
-
-        <div class="card-header">
-            <div>
-                <h3>Weather</h3>
-                <p>Current conditions.</p>
+                <div class="dashboard-card weather-card" id="sec-weather">
+                    <div class="card-header">
+                        <div>
+                            <h3>Weather</h3>
+                            <p>Current conditions.</p>
+                        </div>
+                        <span class="weather-location">Beni Suef</span>
+                    </div>
+                    <div class="weather-main">
+                        <div class="weather-icon" id="weatherIcon">🌡️</div>
+                        <div class="weather-temperature">
+                            <strong id="weatherTemp">--°</strong>
+                            <span id="weatherLabel">Loading…</span>
+                        </div>
+                    </div>
+                    <div class="weather-details">
+                        <div><span>💧</span><strong id="weatherHumidity">--</strong><small>Humidity</small></div>
+                        <div><span>💨</span><strong id="weatherWind">--</strong><small>Wind</small></div>
+                        <div><span>🌡️</span><strong id="weatherFeels">--°</strong><small>Feels like</small></div>
+                    </div>
+                </div>
             </div>
 
-            <span class="weather-location">Beni Suef</span>
-        </div>
+            <div class="dashboard-grid final-grid">
+                <div class="dashboard-card" id="sec-expenses">
+                    <div class="card-header">
+                        <div>
+                            <h3>Expenses</h3>
+                            <p>Recent spending (EGP).</p>
+                        </div>
+                        <button class="card-action" data-open-form="expense">+ Add Expense</button>
+                    </div>
+                    <div class="notes-preview" id="expensesList"></div>
+                </div>
 
-        <div class="weather-main">
-
-            <div class="weather-icon">☀️</div>
-
-            <div class="weather-temperature">
-                <strong>34°</strong>
-                <span>Sunny</span>
+                <div class="dashboard-card">
+                    <div class="card-header">
+                        <div>
+                            <h3>This Month by Category</h3>
+                            <p>Where your money goes.</p>
+                        </div>
+                    </div>
+                    <div class="goals-list" id="categoryList"></div>
+                </div>
             </div>
 
-        </div>
+            <dialog id="entryDialog" aria-labelledby="entryTitle">
+                <form id="entryForm" method="dialog">
+                    <h3 id="entryTitle">New item</h3>
+                    <div id="entryFields"></div>
+                    <div class="dialog-actions">
+                        <button type="button" class="card-action" id="entryCancel">Cancel</button>
+                        <button type="submit" class="card-action primary">Save</button>
+                    </div>
+                </form>
+            </dialog>
 
-        <div class="weather-details">
+        </section>
 
-            <div>
-                <span>💧</span>
-                <strong>42%</strong>
-                <small>Humidity</small>
-            </div>
-
-            <div>
-                <span>💨</span>
-                <strong>18 km/h</strong>
-                <small>Wind</small>
-            </div>
-
-            <div>
-                <span>🌡️</span>
-                <strong>38°</strong>
-                <small>Feels like</small>
-            </div>
-
-        </div>
-
-    </div>
-
-</div>
-
-            </section>
 
         </main>
 
